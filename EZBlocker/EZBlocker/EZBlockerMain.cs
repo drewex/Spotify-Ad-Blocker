@@ -17,6 +17,7 @@ namespace EZBlocker
     public partial class Main : Form
     {
         private bool muted = false;
+        private bool firstlaunch = true;
         private string lastMessage = "";
         private ToolTip artistTooltip = new ToolTip();
 
@@ -45,8 +46,9 @@ namespace EZBlocker
          * Contains the logic for when to mute Spotify
          **/
         private void MainTimer_Tick(object sender, EventArgs e)
-        {
+        {            
             try {
+
                 if (hook.IsRunning())
                 {
                     if (hook.IsAdPlaying())
@@ -109,6 +111,11 @@ namespace EZBlocker
                         StatusLabel.Text = message;
                         artistTooltip.SetToolTip(StatusLabel, "");
                     };
+                }
+                if (firstlaunch)
+                {   // unmute the on initiation
+                    Mute(false);
+                    firstlaunch = false;
                 }
             }
             catch (Exception ex)
@@ -238,11 +245,10 @@ namespace EZBlocker
             /* Start EZBlocker listener
             listener = new Listener();
             Task.Run(() => listener.Listen()); */
-
             MainTimer.Enabled = true;
 
             LogAction("/launch");
-
+            
             Task.Run(() => CheckUpdate());
         }
 
@@ -295,7 +301,7 @@ namespace EZBlocker
             {
                 this.ShowInTaskbar = false;
                 this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
-                Notify(Properties.strings.HiddenNotify);
+                //Notify(Properties.strings.HiddenNotify);
             }
         }
 
